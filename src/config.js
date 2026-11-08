@@ -17,31 +17,30 @@ export const SITE_URL = 'https://www.dudacorretora.com.br'
 //  Enquanto `src` estiver vazio, aparece um placeholder elegante.
 // ------------------------------------------------------------
 export const HERO_VIDEO = {
-  label: 'Icaraí · Frente para o mar',
-  src: '', // ex.: './media/icarai-frente-mar.mp4'
-  poster: '',
+  label: 'Praia de Icaraí · Frente para o mar',
+  src: './media/hero.mp4',
+  poster: './media/hero.webp',
 }
 
 export const TURN_VIDEO = {
   label: 'Tour gravado no celular',
-  src: '',
-  poster: '',
+  src: './media/virada.mp4',
+  poster: './media/virada.webp',
 }
 
 export const BENTO_VIDEO = {
-  label: 'Seu imóvel aqui',
-  src: '',
-  poster: '',
+  label: 'Grotão · Vista panorâmica',
+  src: './media/bento.mp4',
+  poster: './media/bento.webp',
 }
 
+// Trechos dos Reels da Duda (@duda_corretoradeimoveis)
 export const VITRINE = [
-  { bairro: 'Praia de Icaraí', detalhe: '200 m² de frente para o mar', src: '', poster: '' },
-  { bairro: 'Itacoatiara', detalhe: 'Casa brutalista entre árvores', src: '', poster: '' },
-  { bairro: 'Grotão', detalhe: 'Casa com clima de serra', src: '', poster: '' },
-  { bairro: 'Camboinhas', detalhe: 'Triplex em condomínio', src: '', poster: '' },
-  { bairro: 'Jardim Icaraí', detalhe: 'Cobertura com terraço', src: '', poster: '' },
-  { bairro: 'Santa Rosa', detalhe: 'Primeiro apê reformado', src: '', poster: '' },
-  { bairro: 'Charitas', detalhe: 'Vista para a Baía de Guanabara', src: '', poster: '' },
+  { bairro: 'Praia de Icaraí', detalhe: '200 m² de frente para o mar', src: './media/vitrine/icarai-200m.mp4', poster: './media/vitrine/icarai-200m.webp' },
+  { bairro: 'Praia de Icaraí', detalhe: '300 m² com piscina na varanda', src: './media/vitrine/icarai-300m.mp4', poster: './media/vitrine/icarai-300m.webp' },
+  { bairro: 'Jardim Icaraí', detalhe: 'Cobertura com terraço e piscina', src: './media/vitrine/jardim-icarai.mp4', poster: './media/vitrine/jardim-icarai.webp' },
+  { bairro: 'Grotão', detalhe: 'Casa com clima de serra', src: './media/vitrine/grotao.mp4', poster: './media/vitrine/grotao.webp' },
+  { bairro: 'Icaraí', detalhe: '90 m² a passos da praia', src: './media/vitrine/icarai-90m.mp4', poster: './media/vitrine/icarai-90m.webp' },
 ]
 
 export const BAIRROS = [
