@@ -60,6 +60,13 @@ function AboutVideo({ v }) {
   const mobile = useMobile()
   const inView = useInView(ref, { once: true, amount: 0.45 })
   const near = useInView(ref, { once: true, margin: '600px 0px' })
+  const [armed, setArmed] = useState(false)
+  useEffect(() => {
+    const evs = ['wheel', 'touchstart', 'keydown', 'pointerdown']
+    const arm = () => { setArmed(true); evs.forEach((e) => window.removeEventListener(e, arm)) }
+    evs.forEach((e) => window.addEventListener(e, arm, { passive: true }))
+    return () => evs.forEach((e) => window.removeEventListener(e, arm))
+  }, [])
   useEffect(() => {
     const el = ref.current
     if (!el || reduce || !inView) return
@@ -291,6 +298,7 @@ export function Footer() {
           <h2 className="footer__h">{F.contact}</h2>
           <a className="link-u" href={lang === 'en' ? WHATSAPP_URL_EN : WHATSAPP_URL} target="_blank" rel="noopener noreferrer">WhatsApp (21) 99515-4231</a>
           <address>Rua Murilo Portugal, 112 – São Francisco, Niterói/RJ</address>
+          <FooterMap />
         </div>
         <div>
           <h2 className="footer__h">{F.hours}</h2>
@@ -315,6 +323,20 @@ export function Footer() {
       </div>
       <GiantName />
     </footer>
+  )
+}
+
+/* Mapa discreto do escritório: carrega só perto do rodapé; o cartão inteiro abre o Google Maps */
+const MAP_Q = encodeURIComponent('Rua Murilo Portugal, 112, São Francisco, Niterói - RJ')
+function FooterMap() {
+  const F = useT().footer
+  const ref = useRef(null)
+  const near = useInView(ref, { once: true, margin: '600px 0px' })
+  return (
+    <a ref={ref} className="footer__map" href={`https://www.google.com/maps/search/?api=1&query=${MAP_Q}`} target="_blank" rel="noopener noreferrer" aria-label={F.mapAria}>
+      {near && armed && <iframe title={F.mapAria} src={`https://www.google.com/maps?q=${MAP_Q}&z=15&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" tabIndex={-1} aria-hidden="true" />}
+      <span className="footer__map-tag">{F.map} <ArrowIcon width="14" height="14" /></span>
+    </a>
   )
 }
 

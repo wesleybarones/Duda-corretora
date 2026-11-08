@@ -107,6 +107,7 @@ export const STR = {
       social: 'Redes', site: 'Ver imóveis à venda', license: 'Registro',
       copy: 'Duda Corretora de Imóveis · Niterói/RJ',
       top: 'Voltar ao topo',
+      map: 'Abrir no mapa', mapAria: 'Ver o escritório da Duda no Google Maps',
     },
   },
 
@@ -212,6 +213,7 @@ export const STR = {
       social: 'Social', site: 'See homes for sale', license: 'License',
       copy: 'Duda Corretora de Imóveis · Niterói/RJ',
       top: 'Back to top',
+      map: 'Open in Maps', mapAria: "See Duda's office on Google Maps",
     },
   },
 }

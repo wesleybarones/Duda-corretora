@@ -678,6 +678,18 @@ html[data-theme="night"] .comment { color: #13242A; }
 .footer__tag { max-width: 24ch; }
 .footer__h { font: 600 12px/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: #E3A58B; margin: 0 0 6px; }
 .footer a { color: var(--on-pet); justify-self: start; }
+.footer__map { position: relative; display: block; width: 100%; max-width: 280px; height: 132px; margin-top: 8px; border-radius: 16px; overflow: hidden; isolation: isolate;
+  background: #0E3B43 radial-gradient(circle at 50% 46%, rgba(201,123,94,.35) 0 5px, transparent 6px), #0E3B43;
+  border: 1px solid rgba(244, 238, 228, .14); transition: border-color .4s var(--ease), transform .4s var(--ease); }
+.footer__map iframe { position: absolute; inset: -40px -60px; width: calc(100% + 120px); height: calc(100% + 80px); border: 0; pointer-events: none;
+  filter: invert(.92) hue-rotate(180deg) grayscale(.55) sepia(.25) contrast(.88) brightness(.95); opacity: .78; transition: opacity .5s var(--ease), filter .5s var(--ease); }
+.footer__map::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 45%, rgba(10, 46, 52, .85)); }
+.footer__map-tag { position: absolute; left: 12px; bottom: 10px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; letter-spacing: .02em; color: var(--on-pet); }
+.footer__map-tag svg { transition: transform .4s var(--ease); }
+.footer a.footer__map { justify-self: stretch; }
+.footer__map:hover, .footer__map:focus-visible { border-color: rgba(227, 165, 139, .55); transform: translateY(-2px); }
+.footer__map:hover iframe { opacity: 1; filter: invert(.92) hue-rotate(180deg) grayscale(.3) sepia(.2) contrast(.95) brightness(1); }
+.footer__map:hover .footer__map-tag svg { transform: translateX(3px); }
 .footer__bottom { margin-top: 64px; display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; position: relative; z-index: 2; }
 .footer__copy { font-size: 13px; opacity: .7; }
 .footer a.footer__top { display: inline-flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; color: var(--on-pet); }
