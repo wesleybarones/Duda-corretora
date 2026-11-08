@@ -26,3 +26,12 @@ npm run build     # gera a pasta dist/ (pronta para Vercel, Netlify ou qualquer 
 - `src/components/Process.jsx`: espiral do náutilo em "Como funciona" e o bento
 - `src/components/Closing.jsx`: Sobre, Depoimentos, FAQ, CTA final, rodapé, botão flutuante, barra mobile e cursor
 - `src/styles.css`: design system (tokens no `:root`)
+
+## Vídeos
+Os trechos dos Reels ficam em `public/media/` (hero, virada, bento) e `public/media/vitrine/`.
+Para trocar ou adicionar: coloque o `.mp4` (vertical, sem áudio, ~540x960) e a capa `.webp`
+na pasta e ajuste `src/config.js`.
+
+## Publicação
+O projeto `duda-corretora` na Vercel está ligado a este repositório: cada push no `main`
+publica automaticamente em https://duda-corretora.vercel.app.
