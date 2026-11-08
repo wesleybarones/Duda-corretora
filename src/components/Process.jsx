@@ -193,7 +193,7 @@ export function Bento() {
           <Cell i={0} className="cell--big" >
             <div className="cell--big__text" data-dark>
               <h3 className="h3">Vídeo autêntico do seu imóvel</h3>
-              <p>Gravado por mim, com o olhar de quem vende.</p>
+              <p>Gravado por mim e pelo meu cinegrafista, com o olhar de quem vende.</p>
             </div>
             <div className="cell--big__phone"><Phone><MediaSlot item={BENTO_VIDEO} /></Phone></div>
           </Cell>

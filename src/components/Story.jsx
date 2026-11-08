@@ -165,7 +165,7 @@ function ScreenGrid() {
 const SCREENS = [ScreenTour, ScreenComments, ScreenGrid]
 
 const BLOCKS = [
-  { t: 'Só eu, meu celular e o seu imóvel.', d: 'Muitos proprietários esperam uma superprodução. Eu chego com o celular e um olhar cuidadoso. Sem roteiro forçado, com verdade.' },
+  { t: 'Eu, meu cinegrafista e o seu imóvel.', d: 'Muitos proprietários esperam uma superprodução. Eu chego com meu cinegrafista e um olhar cuidadoso. Equipe enxuta, sem roteiro forçado, com verdade.' },
   { t: 'Pessoas se conectam com pessoas reais.', d: 'Quem me assiste confia no que vê. Por isso seu imóvel não é só mais um anúncio: é uma recomendação.' },
   { t: 'Grande visibilidade, do jeito certo.', d: 'Seu imóvel aparece para milhares de pessoas que procuram casa em Niterói, e muitas delas estão prontas para comprar.' },
 ]

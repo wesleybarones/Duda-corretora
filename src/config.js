@@ -23,7 +23,7 @@ export const HERO_VIDEO = {
 }
 
 export const TURN_VIDEO = {
-  label: 'Tour gravado no celular',
+  label: 'Tour do imóvel em Icaraí',
   src: './media/virada.mp4',
   poster: './media/virada.webp',
 }
