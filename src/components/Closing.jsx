@@ -283,7 +283,7 @@ export function Footer() {
     <footer className="footer" data-dark>
       <div className="container footer__grid">
         <div>
-          <p className="footer__brand sunlit"><Scallop size={24} stroke={1.3} /> Duda</p>
+          <p className="footer__brand"><Scallop size={24} stroke={1.3} /> Duda</p>
           <p className="footer__tag">{F.tag}</p>
         </div>
         <div>
@@ -306,7 +306,7 @@ export function Footer() {
         </div>
       </div>
       <p className="footer__copy container">© {new Date().getFullYear()} {F.copy}</p>
-      <p className="footer__giant sunlit" aria-hidden="true"><span>Duda</span></p>
+      <p className="footer__giant" aria-hidden="true"><span>Duda</span></p>
     </footer>
   )
 }

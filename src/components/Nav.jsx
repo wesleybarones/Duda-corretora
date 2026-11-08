@@ -67,7 +67,7 @@ export default function Nav() {
         transition={{ duration: 0.6, ease: EASE }}
       >
         <nav className="nav__pill" aria-label={T.nav.aria}>
-          <a href="#topo" className="nav__brand sunlit" onClick={go('topo')} aria-label={T.nav.brand}>
+          <a href="#topo" className="nav__brand" onClick={go('topo')} aria-label={T.nav.brand}>
             <Scallop size={22} stroke={1.4} />
             <span>Duda</span>
           </a>
@@ -104,7 +104,7 @@ export default function Nav() {
             exit={{ clipPath: 'circle(0% at 90% 40px)' }}
             transition={{ duration: 0.7, ease: EASE }}
           >
-            <span className="menu__sun sunlit" aria-hidden="true"><Scallop size={260} stroke={0.6} className="menu__shell" /></span>
+            <span className="menu__sun" aria-hidden="true"><Scallop size={260} stroke={0.6} className="menu__shell" /></span>
             <ul>
               {LINKS.map((l, i) => (
                 <motion.li key={l.id} initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 + i * 0.07, duration: 0.6, ease: EASE }}>

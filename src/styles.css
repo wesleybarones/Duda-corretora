@@ -104,8 +104,6 @@ html[data-theme="night"] {
 html.theme-anim, html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
   transition: background-color .7s var(--ease), color .7s var(--ease), border-color .7s var(--ease), fill .7s, stroke .7s !important;
 }
-html[data-theme="night"] .sunlit::before { background: radial-gradient(circle, rgba(226, 236, 240, calc(var(--sun-a, .8) * .7)) 0%, rgba(160, 196, 205, calc(var(--sun-a, .8) * .3)) 36%, rgba(120, 160, 170, 0) 68%); }
-html[data-theme="night"] .sunlit::after { background: repeating-conic-gradient(from 0deg, rgba(220, 235, 240, 0) 0deg 9deg, rgba(220, 235, 240, calc(var(--ray-a, .45) * .6)) 11deg 13deg, rgba(220, 235, 240, 0) 15deg 24deg); }
 html[data-theme="night"] .media__ph-play { background: rgba(250, 247, 242, .82); color: #0E3B43; }
 html[data-theme="night"] .comment { color: #13242A; }
 
@@ -683,28 +681,6 @@ html[data-theme="night"] .comment { color: #13242A; }
 .footer__giant { font: italic 300 clamp(160px, 34vw, 520px)/.8 var(--serif); color: var(--on-pet); opacity: .1; text-align: center; letter-spacing: -.04em; margin: 10px 0 -.36em; user-select: none; }
 
 
-/* luz do sol atrás dos logos */
-.sunlit { position: relative; isolation: isolate; }
-.sunlit::before, .sunlit::after {
-  content: ''; position: absolute; left: var(--sun-x, 50%); top: var(--sun-y, 50%); width: var(--sun, 110px); aspect-ratio: 1;
-  translate: -50% -50%; border-radius: 50%; pointer-events: none; z-index: -1;
-}
-.sunlit::before {
-  background: radial-gradient(circle, rgba(255, 218, 160, var(--sun-a, .8)) 0%, rgba(240, 168, 112, calc(var(--sun-a, .8) * .45)) 34%, rgba(201, 123, 94, 0) 68%);
-  animation: sun-breath 7s ease-in-out infinite;
-}
-.sunlit::after {
-  background: repeating-conic-gradient(from 0deg, rgba(255, 222, 170, 0) 0deg 9deg, rgba(255, 222, 170, var(--ray-a, .45)) 11deg 13deg, rgba(255, 222, 170, 0) 15deg 24deg);
-  -webkit-mask: radial-gradient(circle, #000 18%, transparent 66%); mask: radial-gradient(circle, #000 18%, transparent 66%);
-  animation: sun-spin 48s linear infinite;
-}
-@keyframes sun-breath { 0%, 100% { transform: scale(.9); opacity: .85; } 50% { transform: scale(1.08); opacity: 1; } }
-@keyframes sun-spin { to { transform: rotate(360deg); } }
-.nav__brand.sunlit { --sun: 120px; --sun-x: 22px; --sun-a: .7; --ray-a: .38; }
-.footer__brand.sunlit { --sun: 220px; --sun-x: 24px; --sun-a: .55; --ray-a: .3; }
-.footer__giant.sunlit { --sun: min(80vw, 900px); --sun-y: 58%; --sun-a: .35; --ray-a: .16; opacity: 1; }
-.footer__giant.sunlit span { opacity: .1; }
-.menu .sunlit { --sun: 360px; --sun-a: .4; --ray-a: .22; }
 
 /* =========================================================
    Flutuantes / cursor
