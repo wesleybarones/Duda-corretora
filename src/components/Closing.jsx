@@ -327,14 +327,16 @@ export function Footer() {
 }
 
 /* Mapa discreto do escritório: carrega só perto do rodapé; o cartão inteiro abre o Google Maps */
-const MAP_Q = encodeURIComponent('Rua Murilo Portugal, 112, São Francisco, Niterói - RJ')
+// Ponto exato do escritório no Google Maps (R. Murilo Portugal, 112 – Niterói, CEP 24360-410)
+const MAP_LL = '-22.9240553,-43.0932589'
+const MAP_PLACE = 'https://www.google.com/maps/place/R.+Murilo+Portugal,+112+-+Charitas,+Niter%C3%B3i+-+RJ,+24360-410/@-22.9240705,-43.0958046,17z/data=!3m1!4b1!4m6!3m5!1s0x9986adea3827ed:0x919711a416e90b67!8m2!3d-22.9240553!4d-43.0932589!16s%2Fg%2F11b8tdz_l2'
 function FooterMap() {
   const F = useT().footer
   const ref = useRef(null)
   const near = useInView(ref, { once: true, margin: '600px 0px' })
   return (
-    <a ref={ref} className="footer__map" href={`https://www.google.com/maps/search/?api=1&query=${MAP_Q}`} target="_blank" rel="noopener noreferrer" aria-label={F.mapAria}>
-      {near && armed && <iframe title={F.mapAria} src={`https://www.google.com/maps?q=${MAP_Q}&z=15&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" tabIndex={-1} aria-hidden="true" />}
+    <a ref={ref} className="footer__map" href={MAP_PLACE} target="_blank" rel="noopener noreferrer" aria-label={F.mapAria}>
+      {near && armed && <iframe title={F.mapAria} src={`https://www.google.com/maps?q=${MAP_LL}&z=16&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" tabIndex={-1} aria-hidden="true" />}
       <span className="footer__map-tag">{F.map} <ArrowIcon width="14" height="14" /></span>
     </a>
   )
