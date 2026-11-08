@@ -5,6 +5,7 @@ import { ABOUT, TESTIMONIALS, TESTIMONIAL_VIDEO, FAQ, WHATSAPP_URL, INSTAGRAM_UR
 import { WaveRecede } from './Story'
 import { useT, tx } from '../i18n'
 import { usePrefs } from '../prefs'
+import { scrollStore } from '../scroll'
 import { WHATSAPP_URL_EN } from '../config'
 
 /* ======================= SOBRE ======================= */
@@ -305,10 +306,36 @@ export function Footer() {
           <p>CRECI 104.409</p>
         </div>
       </div>
-      <p className="footer__copy container">© {new Date().getFullYear()} {F.copy}</p>
-      <p className="footer__giant" aria-hidden="true"><span>Duda</span></p>
+      <div className="footer__bottom container">
+        <p className="footer__copy">© {new Date().getFullYear()} {F.copy}</p>
+        <a href="#topo" className="footer__top" onClick={toTop}>
+          <span>{F.top}</span>
+          <span className="footer__top-ic" aria-hidden="true"><ArrowIcon size={16} /></span>
+        </a>
+      </div>
+      <GiantName />
     </footer>
   )
+}
+
+const toTop = (e) => {
+  e.preventDefault()
+  if (scrollStore.lenis) scrollStore.lenis.scrollTo(0, { duration: 2.2 })
+  else window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+/* "Duda" gigante do rodapé: acende onde o cursor (ou o dedo) passa */
+function GiantName() {
+  const ref = useRef(null)
+  const move = (e) => {
+    const el = ref.current; if (!el) return
+    const r = el.getBoundingClientRect()
+    el.style.setProperty('--mx', `${e.clientX - r.left}px`)
+    el.style.setProperty('--my', `${e.clientY - r.top}px`)
+  }
+  const on = (e) => { move(e); ref.current?.classList.add('is-lit') }
+  const off = () => ref.current?.classList.remove('is-lit')
+  return <p ref={ref} className="footer__giant" aria-hidden="true" data-t="Duda" onPointerEnter={on} onPointerMove={move} onPointerLeave={off} onPointerUp={(e) => { if (e.pointerType !== 'mouse') setTimeout(off, 900) }} />
 }
 
 /* ======================= Flutuantes ======================= */

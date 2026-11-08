@@ -106,6 +106,7 @@ export const STR = {
       contact: 'Contato', hours: 'Horário', hoursText: 'Seg. a sex., 9h às 18h',
       social: 'Redes', site: 'Ver imóveis à venda', license: 'Registro',
       copy: 'Duda Corretora de Imóveis · Niterói/RJ',
+      top: 'Voltar ao topo',
     },
   },
 
@@ -210,6 +211,7 @@ export const STR = {
       contact: 'Contact', hours: 'Hours', hoursText: 'Mon–Fri, 9am–6pm',
       social: 'Social', site: 'See homes for sale', license: 'License',
       copy: 'Duda Corretora de Imóveis · Niterói/RJ',
+      top: 'Back to top',
     },
   },
 }

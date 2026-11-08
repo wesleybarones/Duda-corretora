@@ -91,7 +91,7 @@ export function Problem() {
 export function WaveRecede({ color = 'var(--areia)' }) {
   const ref = useRef(null)
   const reduce = useReducedMotion()
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 92%', 'start start'] })
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 100%', 'start 40%'] })
   const y = useTransform(scrollYProgress, [0, 1], ['calc(0% - 0px)', 'calc(-100% - 160px)'])
   const wy = useTransform(scrollYProgress, [0, 1], [0, -40])
   if (reduce) return <div ref={ref} />
