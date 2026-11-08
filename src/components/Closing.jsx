@@ -46,6 +46,26 @@ function Signature() {
   )
 }
 
+/* Vídeo da Duda: toca uma vez ao entrar na tela e para no último quadro */
+function AboutVideo({ v }) {
+  const ref = useRef(null)
+  const reduce = useReducedMotion()
+  const mobile = useMobile()
+  const inView = useInView(ref, { once: true, amount: 0.45 })
+  useEffect(() => {
+    const el = ref.current
+    if (!el || reduce || !inView) return
+    const p = el.play()
+    if (p && p.catch) p.catch(() => {})
+  }, [inView, reduce])
+  const alt = 'Duda, corretora de imóveis em Niterói, cruza os braços e sorri'
+  if (reduce) return <img src={v.final || v.poster} alt={alt} loading="lazy" />
+  return (
+    <video ref={ref} src={mobile && v.srcMobile ? v.srcMobile : v.src} poster={v.poster}
+      muted playsInline preload="metadata" aria-label={alt} />
+  )
+}
+
 export function About() {
   const ref = useRef(null)
   const reduce = useReducedMotion()
@@ -60,8 +80,8 @@ export function About() {
               <path d="M0 0.2 C0 0.12 0.05 0.1 0.083 0.06 C0.12 0.02 0.16 0.02 0.2 0.05 C0.24 0.02 0.29 0 0.333 0.03 C0.38 0 0.45 -0.01 0.5 0.02 C0.55 -0.01 0.62 0 0.667 0.03 C0.71 0 0.76 0.02 0.8 0.05 C0.84 0.02 0.88 0.02 0.917 0.06 C0.95 0.1 1 0.12 1 0.2 L1 0.96 C1 0.985 0.985 1 0.96 1 L0.04 1 C0.015 1 0 0.985 0 0.96 Z" />
             </clipPath>
           </svg>
-          <div className="about__photo">
-            {ABOUT.photo ? <img src={ABOUT.photo} alt="Duda, corretora de imóveis em Niterói" loading="lazy" /> : (
+          <div className={`about__photo ${ABOUT.video ? 'about__photo--video' : ''}`}>
+            {ABOUT.video ? <AboutVideo v={ABOUT.video} /> : ABOUT.photo ? <img src={ABOUT.photo} alt="Duda, corretora de imóveis em Niterói" loading="lazy" /> : (
               <div className="about__ph"><Scallop size={90} stroke={0.9} /><span>Foto da Duda</span></div>
             )}
           </div>

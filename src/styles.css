@@ -511,6 +511,9 @@ body::after {
 .about__photo-wrap { grid-column: 1 / span 5; position: relative; }
 .about__photo { aspect-ratio: 4 / 5; clip-path: url(#scallop-top); overflow: hidden; box-shadow: var(--shadow); }
 .about__photo img { width: 100%; height: 100%; object-fit: cover; filter: sepia(.07) saturate(.95); }
+.about__photo--video { aspect-ratio: 3 / 4; background: #E6DED1; }
+.about__photo-wrap:has(.about__photo--video) .about__seal { bottom: -18px; }
+.about__photo video { display: block; width: 100%; height: 100%; object-fit: cover; filter: sepia(.07) saturate(.95); }
 .about__ph { width: 100%; height: 100%; display: grid; place-items: center; align-content: center; gap: 18px; color: var(--on-pet); background: linear-gradient(175deg, #EFE6D8 0%, #CDBFA8 22%, #5E8486 60%, #0E3B43 100%); }
 .about__ph svg { opacity: .8; }
 .about__ph span { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; opacity: .85; }

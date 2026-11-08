@@ -53,7 +53,15 @@ export const BAIRROS = [
 //  SOBRE A DUDA — substitua os placeholders entre colchetes.
 // ------------------------------------------------------------
 export const ABOUT = {
-  photo: './media/duda.webp', // foto vertical 4:5
+  photo: './media/duda.webp', // foto vertical 4:5 (usada se não houver vídeo)
+  // Vídeo da Duda (toca uma vez quando a seção aparece e para no último quadro).
+  // Deixe null para mostrar só a foto.
+  video: {
+    src: './media/duda.mp4',
+    srcMobile: './media/duda-mobile.mp4',
+    poster: './media/duda-poster.webp', // primeiro quadro
+    final: './media/duda-final.webp', // último quadro (usado com "reduzir movimento")
+  },
   bio: '[Breve história da Duda: de onde é, há quanto tempo trabalha com imóveis e por que escolheu Niterói.]',
   // value: null mostra "[00]+". Coloque um número (ex.: 8) para ativar a contagem animada.
   stats: [
