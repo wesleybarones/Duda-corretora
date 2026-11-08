@@ -2,14 +2,9 @@ import { useRef, useState, useMemo } from 'react'
 import { motion, useScroll, useTransform, useMotionValueEvent, useInView, useReducedMotion } from 'framer-motion'
 import { RevealTitle, Reveal, Eyebrow, CTA, Phone, MediaSlot, EyeIcon, EASE, useDesktop } from './ui'
 import { BENTO_VIDEO } from '../config'
+import { useT } from '../i18n'
 
 /* ======================= COMO FUNCIONA ======================= */
-const STEPS = [
-  { t: 'Você me chama', d: 'Um oi no WhatsApp e já combinamos o melhor dia para eu conhecer seu imóvel.' },
-  { t: 'Eu visito seu imóvel', d: 'Conheço cada detalhe, entendo sua expectativa e alinhamos um preço justo para o mercado do bairro.' },
-  { t: 'Eu gravo e divulgo', d: 'Faço o vídeo pessoalmente e coloco seu imóvel na minha vitrine, no Instagram e no site.' },
-  { t: 'Eu cuido do resto', d: 'Filtro os interessados, acompanho as visitas, conduzo a negociação e cuido da documentação até a assinatura.' },
-]
 
 const VB = { w: 1200, h: 720, cx: 600, cy: 360, rMax: 320, rMin: 34, turns: 1.9 }
 function buildSpiral() {
@@ -44,6 +39,8 @@ const CARD_POS = [
 ]
 
 function SpiralDesktop() {
+  const T = useT()
+  const STEPS = T.how.steps
   const ref = useRef(null)
   const reduce = useReducedMotion()
   const { d, anchors, end } = useMemo(buildSpiral, [])
@@ -77,7 +74,7 @@ function SpiralDesktop() {
         return (
           <div key={i} className={`spiral__step ${i < lit ? 'is-lit' : ''} spiral__step--${c.side}`}
             style={{ left: `${(c.x / VB.w) * 100}%`, top: `${(c.y / VB.h) * 100}%` }}>
-            <span className="step__k">Passo {i + 1}</span>
+            <span className="step__k">{T.how.step} {i + 1}</span>
             <h3 className="h3">{s.t}</h3>
             <p>{s.d}</p>
           </div>
@@ -101,6 +98,8 @@ function TideStep({ s, i }) {
   )
 }
 function TideLine() {
+  const T = useT()
+  const STEPS = T.how.steps
   const ref = useRef(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 80%', 'end 70%'] })
   const reduce = useReducedMotion()
@@ -116,17 +115,18 @@ function TideLine() {
 }
 
 export function HowItWorks() {
+  const T = useT()
   const desktop = useDesktop()
   return (
     <section id="como-funciona" className="section how grain" aria-labelledby="how-title">
       <div className="container how__head">
-        <Eyebrow>Sem complicação</Eyebrow>
-        <RevealTitle id="how-title" text="Do primeiro oi até a *chave na mão* de quem comprou." className="h2" />
+        <Eyebrow>{T.how.eyebrow}</Eyebrow>
+        <RevealTitle id="how-title" text={T.how.title} className="h2" />
       </div>
       <div className="container">{desktop ? <SpiralDesktop /> : <TideLine />}</div>
       <Reveal className="how__cta">
         <CTA size="lg" />
-        <p className="micro">Leva 1 minuto. Sem compromisso.</p>
+        <p className="micro">{T.how.micro}</p>
       </Reveal>
     </section>
   )
@@ -154,12 +154,13 @@ function Cell({ className = '', children, i }) {
 }
 
 function Calendar() {
+  const T = useT()
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, amount: 0.5 })
   const checked = [3, 8, 12, 17]
   return (
     <div ref={ref} className="cal" aria-hidden="true">
-      {['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map((d, i) => <span key={'h' + i} className="cal__h">{d}</span>)}
+      {T.bento.days.map((d, i) => <span key={'h' + i} className="cal__h">{d}</span>)}
       {Array.from({ length: 21 }).map((_, i) => (
         <span key={i} className={`cal__d ${checked.includes(i) ? 'is-on' : ''}`}>
           {checked.includes(i) && (
@@ -184,23 +185,25 @@ function MiniChart() {
 }
 
 export function Bento() {
+  const T = useT()
+  const B = T.bento
   return (
     <section className="section bento-sec" aria-labelledby="bento-title">
       <div className="container">
-        <Eyebrow>Para o proprietário</Eyebrow>
-        <RevealTitle id="bento-title" text="Tudo o que seu imóvel precisa para *sair*." className="h2 bento-sec__title" />
+        <Eyebrow>{B.eyebrow}</Eyebrow>
+        <RevealTitle id="bento-title" text={B.title} className="h2 bento-sec__title" />
         <div className="bento">
           <Cell i={0} className="cell--big" >
             <div className="cell--big__text" data-dark>
-              <h3 className="h3">Vídeo autêntico do seu imóvel</h3>
-              <p>Gravado por mim e pelo meu cinegrafista, com o olhar de quem vende.</p>
+              <h3 className="h3">{B.video[0]}</h3>
+              <p>{B.video[1]}</p>
             </div>
             <div className="cell--big__phone"><Phone><MediaSlot item={BENTO_VIDEO} /></Phone></div>
           </Cell>
           <Cell i={1} className="cell--vis">
             <div className="rings" aria-hidden="true"><span /><span /><span /><EyeIcon /></div>
-            <h3 className="h3">Grande visibilidade</h3>
-            <p>Uma das maiores vitrines de imóveis de Niterói.</p>
+            <h3 className="h3">{B.vis[0]}</h3>
+            <p>{B.vis[1]}</p>
           </Cell>
           <Cell i={2} className="cell--free">
             <svg className="lock" viewBox="0 0 40 40" aria-hidden="true">
@@ -208,20 +211,20 @@ export function Bento() {
               <rect x="9" y="18" width="22" height="16" rx="4" />
               <path d="M20 24 v4" />
             </svg>
-            <h3 className="h3">Sem exclusividade</h3>
-            <p>Você continua livre.</p>
+            <h3 className="h3">{B.free[0]}</h3>
+            <p>{B.free[1]}</p>
           </Cell>
           <Cell i={3} className="cell--visits">
             <div>
-              <h3 className="h3">Visitas com quem quer comprar</h3>
-              <p>Eu filtro antes de marcar.</p>
+              <h3 className="h3">{B.visits[0]}</h3>
+              <p>{B.visits[1]}</p>
             </div>
             <Calendar />
           </Cell>
           <Cell i={4} className="cell--price">
             <MiniChart />
-            <h3 className="h3">Preço alinhado ao mercado</h3>
-            <p>Leitura do bairro na visita.</p>
+            <h3 className="h3">{B.price[0]}</h3>
+            <p>{B.price[1]}</p>
           </Cell>
           <Cell i={5} className="cell--docs">
             <div className="papers" aria-hidden="true">
@@ -230,8 +233,8 @@ export function Bento() {
               ))}
             </div>
             <div>
-              <h3 className="h3">Burocracia comigo</h3>
-              <p>Documentos, certidões e acompanhamento até a escritura.</p>
+              <h3 className="h3">{B.docs[0]}</h3>
+              <p>{B.docs[1]}</p>
             </div>
           </Cell>
         </div>

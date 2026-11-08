@@ -1,18 +1,21 @@
 import { useRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform, useInView, useReducedMotion } from 'framer-motion'
 import { RevealTitle, Reveal, Eyebrow, Phone, MediaSlot, Scallop, Nautilus, PlayIcon, HeartIcon, EASE, useDesktop } from './ui'
-import { BAIRROS, TURN_VIDEO, VITRINE } from '../config'
+import { BAIRROS, TURN_VIDEO, VITRINE, PERFIL } from '../config'
+import { useT, tx } from '../i18n'
+import { usePrefs } from '../prefs'
 
 /* ======================= MARQUEE ======================= */
 export function Marquee() {
+  const T = useT()
   const row = (outline) => (
     <div className={`marquee__row ${outline ? 'marquee__row--outline' : ''}`} aria-hidden={outline ? 'true' : undefined}>
       <div className="marquee__track">
         {[0, 1].map((k) => (
           <div className="marquee__group" key={k} aria-hidden={k === 1 ? 'true' : undefined}>
             {BAIRROS.map((b) => (
-              <span className="marquee__item" key={b}>
-                {b}<Scallop size={18} stroke={1.4} className="marquee__shell" />
+              <span className="marquee__item" key={b} data-t={outline ? b : undefined}>
+                {outline ? null : b}<Scallop size={18} stroke={1.4} className="marquee__shell" />
               </span>
             ))}
           </div>
@@ -21,7 +24,7 @@ export function Marquee() {
     </div>
   )
   return (
-    <section className="marquee" data-dark aria-label="Bairros que eu atendo em Niterói">
+    <section className="marquee" data-dark aria-label={T.marquee}>
       {row(false)}
       {row(true)}
     </section>
@@ -29,17 +32,13 @@ export function Marquee() {
 }
 
 /* ======================= O PROBLEMA ======================= */
-const PAINS = [
-  { n: '01', t: 'Anúncio parado', d: 'Seu imóvel some no meio de milhares de fotos iguais em portais.' },
-  { n: '02', t: 'Visita que não compra', d: 'Você abre a porta, arruma a casa e a pessoa só queria conhecer.' },
-  { n: '03', t: 'Papelada sem fim', d: 'Certidões, documentos, banco, cartório. Tudo cai no seu colo.' },
-]
 
 function LetterReveal({ text }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, amount: 0.6 })
   return (
-    <p ref={ref} className="bridge" aria-label={text}>
+    <p ref={ref} className="bridge">
+      <span className="sr-only">{text}</span>
       {text.split(' ').map((w, wi, arr) => {
         const before = arr.slice(0, wi).join(' ').length + (wi ? 1 : 0)
         return (
@@ -57,22 +56,24 @@ function LetterReveal({ text }) {
 }
 
 export function Problem() {
+  const T = useT()
+  const P = T.problem
   return (
     <section id="problema" className="section problem grain" aria-labelledby="problem-title">
       <div className="container problem__grid">
         <div className="problem__head">
-          <Eyebrow>Vender imóvel não precisa ser assim</Eyebrow>
-          <RevealTitle id="problem-title" text="Você não tem tempo a perder com quem só está *olhando*." className="h2" />
+          <Eyebrow>{P.eyebrow}</Eyebrow>
+          <RevealTitle id="problem-title" text={P.title} className="h2" />
           <Nautilus size={140} stroke={0.8} className="problem__orn" />
         </div>
         <ol className="problem__list">
-          {PAINS.map((p, i) => (
-            <motion.li key={p.n} className="pain"
+          {P.pains.map((p, i) => (
+            <motion.li key={i} className="pain"
               initial={{ opacity: 0, x: 80, filter: 'blur(8px)' }}
               whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: 0.9, delay: i * 0.08, ease: EASE }}>
-              <span className="pain__n" aria-hidden="true">{p.n}</span>
+              <span className="pain__n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               <div>
                 <h3 className="h3">{p.t}</h3>
                 <p>{p.d}</p>
@@ -81,13 +82,13 @@ export function Problem() {
           ))}
         </ol>
       </div>
-      <LetterReveal text="Eu faço diferente. E é bem simples." />
+      <LetterReveal key={P.bridge} text={P.bridge} />
     </section>
   )
 }
 
 /* ======================= Onda que recua (transição de seção) ======================= */
-export function WaveRecede({ color = '#EFE6D8' }) {
+export function WaveRecede({ color = 'var(--areia)' }) {
   const ref = useRef(null)
   const reduce = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 92%', 'start start'] })
@@ -96,9 +97,9 @@ export function WaveRecede({ color = '#EFE6D8' }) {
   if (reduce) return <div ref={ref} />
   return (
     <div ref={ref} className="recede" aria-hidden="true">
-      <motion.div className={`recede__fill ${color === '#EFE6D8' ? 'grain' : ''}`} style={{ y, background: color }}>
+      <motion.div className="recede__fill" style={{ y, background: color }}>
         <motion.svg className="recede__wave" viewBox="0 0 1440 120" preserveAspectRatio="none" style={{ y: wy }}>
-          <path fill={color} d="M0 0 H1440 V40 C1300 100 1150 30 980 62 C820 92 700 110 520 70 C360 36 200 60 0 96 Z" />
+          <path style={{ fill: color }} d="M0 0 H1440 V40 C1300 100 1150 30 980 62 C820 92 700 110 520 70 C360 36 200 60 0 96 Z" />
         </motion.svg>
       </motion.div>
     </div>
@@ -106,29 +107,26 @@ export function WaveRecede({ color = '#EFE6D8' }) {
 }
 
 /* ======================= A VIRADA ======================= */
-const COMMENTS = [
-  { c: 'Que luz linda nessa sala', a: '#C97B5E' },
-  { c: 'Dá pra marcar uma visita?', a: '#1F5A63' },
-  { c: 'Finalmente um vídeo que mostra a casa de verdade', a: '#A9C1C0' },
-  { c: 'Qual o andar? Amei a varanda', a: '#DCCFBB' },
-  { c: 'Te chamei no direct!', a: '#C97B5E' },
-]
+const COMMENT_COLORS = ['#C97B5E', '#1F5A63', '#A9C1C0', '#DCCFBB', '#C97B5E']
 
 function ScreenTour() {
+  const T = useT()
   return (
     <div className="scr">
       <MediaSlot item={TURN_VIDEO} />
-      <span className="rec" aria-hidden="true"><i /> gravando</span>
+      <span className="rec" aria-hidden="true"><i /> {T.turn.rec}</span>
+      <span className="reel-user" aria-hidden="true"><img src={PERFIL.foto} alt="" width="26" height="26" loading="lazy" />{PERFIL.handle}</span>
     </div>
   )
 }
 function ScreenComments() {
+  const T = useT()
   return (
     <div className="scr scr--comments">
       <div className="scr__blurbg"><MediaSlot item={VITRINE[0]} playing={false} showLabel={false} /></div>
       <div className="comments">
-        <p className="comments__title">Comentários</p>
-        {COMMENTS.map((k, i) => (
+        <p className="comments__title">{T.turn.comments}</p>
+        {T.turn.commentList.map((c, i) => ({ c, a: COMMENT_COLORS[i] })).map((k, i) => (
           <motion.div key={i} className="comment" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.12, duration: 0.5, ease: EASE }}>
             <span className="comment__av" style={{ background: k.a }} />
             <span className="comment__body"><span className="comment__name" />{k.c}</span>
@@ -142,20 +140,44 @@ function ScreenComments() {
     </div>
   )
 }
+const fmtViews = (n, lang) => {
+  if (n < 1000) return String(n)
+  const k = (n / 1000).toFixed(1).replace(/\.0$/, '')
+  return lang === 'en' ? `${k}K` : `${k.replace('.', ',')} mil`
+}
+
+function TileMedia({ r }) {
+  const ref = useRef(null)
+  const near = useInView(ref, { once: true, margin: '300px 0px' })
+  const visible = useInView(ref, { amount: 0.3 })
+  useEffect(() => {
+    const v = ref.current
+    if (!(v instanceof HTMLVideoElement)) return
+    if (visible) { const p = v.play(); if (p && p.catch) p.catch(() => {}) } else v.pause()
+  }, [visible, near])
+  const poster = `./media/perfil/${r.id}.webp`
+  if (r.video) return <video ref={ref} src={near ? r.video : undefined} poster={near ? poster : undefined} muted loop playsInline preload="none" aria-hidden="true" />
+  return <img ref={ref} src={poster} alt="" loading="lazy" width="180" height="320" />
+}
+
 function ScreenGrid() {
+  const T = useT()
+  const { lang } = usePrefs()
   return (
     <div className="scr scr--grid">
       <div className="profile">
-        <span className="profile__av"><Scallop size={22} stroke={1.4} /></span>
+        <img className="profile__av" src={PERFIL.foto} alt="" width="44" height="44" loading="lazy" />
         <div>
-          <p className="profile__handle">@duda_corretoradeimoveis</p>
-          <p className="profile__bio">Vitrine de imóveis · Niterói</p>
+          <p className="profile__handle">@{PERFIL.handle}</p>
+          <p className="profile__bio">{tx(PERFIL, 'bio', lang)}</p>
         </div>
       </div>
+      <p className="profile__tab">{T.turn.topReels}</p>
       <div className="tiles">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <motion.span key={i} className="tile" style={{ '--h': i }} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 + i * 0.04, duration: 0.5, ease: EASE }}>
-            <PlayIcon width="12" height="12" />
+        {PERFIL.reels.map((r, i) => (
+          <motion.span key={r.id} className="tile" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.08 + i * 0.05, duration: 0.5, ease: EASE }}>
+            <TileMedia r={r} />
+            <span className="tile__views"><PlayIcon width="10" height="10" />{fmtViews(r.views, lang)}</span>
           </motion.span>
         ))}
       </div>
@@ -164,11 +186,6 @@ function ScreenGrid() {
 }
 const SCREENS = [ScreenTour, ScreenComments, ScreenGrid]
 
-const BLOCKS = [
-  { t: 'Eu, meu olhar e o seu imóvel.', d: 'Muitos proprietários esperam uma superprodução. Eu chego com meu cinegrafista e um olhar cuidadoso. Equipe enxuta, sem roteiro forçado, com verdade.' },
-  { t: 'Pessoas se conectam com pessoas reais.', d: 'Quem me assiste confia no que vê. Por isso seu imóvel não é só mais um anúncio: é uma recomendação.' },
-  { t: 'Grande visibilidade, do jeito certo.', d: 'Seu imóvel aparece para milhares de pessoas que procuram casa em Niterói, e muitas delas estão prontas para comprar.' },
-]
 
 function TurnBlock({ i, b, onActive, desktop }) {
   const ref = useRef(null)
@@ -199,7 +216,8 @@ function ScrollQuote({ text }) {
     <figure ref={ref} className="quote">
       <Scallop size={44} stroke={1.1} className="quote__shell" />
       <blockquote>
-        <p aria-label={text}>
+        <p>
+          <span className="sr-only">{text}</span>
           <span aria-hidden="true" className="quote__mark">“</span>
           {words.map((w, i) => <QuoteWord key={i} w={w} i={i} n={words.length} p={scrollYProgress} />)}
           <span aria-hidden="true" className="quote__mark">”</span>
@@ -212,11 +230,13 @@ function ScrollQuote({ text }) {
 function QuoteWord({ w, i, n, p }) {
   const reduce = useReducedMotion()
   const start = i / n
-  const o = useTransform(p, [start, Math.min(1, start + 1.5 / n)], [0.2, 1])
+  const o = useTransform(p, [start, Math.min(1, start + 1.5 / n)], [0.55, 1])
   return <motion.span aria-hidden="true" style={{ opacity: reduce ? 1 : o }}>{w} </motion.span>
 }
 
 export function Turn() {
+  const T = useT()
+  const BLOCKS = T.turn.blocks
   const [active, setActive] = useState(0)
   const desktop = useDesktop()
   const ref = useRef(null)
@@ -228,16 +248,15 @@ export function Turn() {
 
   return (
     <section ref={ref} className="turn" data-dark aria-labelledby="turn-title">
-      <WaveRecede color="#EFE6D8" />
+      <WaveRecede color="var(--areia)" />
       <div className="turn__shells" aria-hidden="true">
         <motion.div style={{ y: l1 }}><Scallop size={180} stroke={0.7} className="ts ts--1" /><Nautilus size={260} stroke={0.6} className="ts ts--2" /></motion.div>
         <motion.div style={{ y: l2 }}><Scallop size={110} stroke={0.8} className="ts ts--3" /><Nautilus size={150} stroke={0.7} className="ts ts--4" /></motion.div>
       </div>
 
       <div className="container turn__intro">
-        <Eyebrow light>A virada</Eyebrow>
-        <RevealTitle text="Em tempos de IA, a *autenticidade* é o funil." className="h2" />
-        <span id="turn-title" className="sr-only">Autenticidade é o funil</span>
+        <Eyebrow light>{T.turn.eyebrow}</Eyebrow>
+        <RevealTitle id="turn-title" text={T.turn.title} className="h2" />
       </div>
 
       <div className="container turn__grid">
@@ -263,7 +282,7 @@ export function Turn() {
       </div>
 
       <div className="container">
-        <ScrollQuote text="A simplicidade atrai, a autenticidade vende e ser de verdade gera confiança." />
+        <ScrollQuote key={T.turn.quote} text={T.turn.quote} />
       </div>
     </section>
   )

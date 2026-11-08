@@ -1,17 +1,18 @@
-import { useEffect, useRef, useState, Fragment } from 'react'
+import { useEffect, useRef, useState, Fragment, startTransition } from 'react'
 import { motion, useMotionValue, useSpring, useReducedMotion, useInView } from 'framer-motion'
-import { WHATSAPP_URL, CTA_LABEL } from '../config'
+import { WHATSAPP_URL, WHATSAPP_URL_EN } from '../config'
+import { useT } from '../i18n'
+import { usePrefs } from '../prefs'
 
 export const EASE = [0.22, 1, 0.36, 1]
 
 /* ---------------- hooks ---------------- */
+// Começa sempre com `initial` (igual ao HTML pré-renderizado) e ajusta logo após montar.
 export function useMedia(query, initial = false) {
-  const [match, setMatch] = useState(() =>
-    typeof window === 'undefined' ? initial : window.matchMedia(query).matches,
-  )
+  const [match, setMatch] = useState(initial)
   useEffect(() => {
     const m = window.matchMedia(query)
-    const on = () => setMatch(m.matches)
+    const on = () => startTransition(() => setMatch(m.matches))
     on()
     m.addEventListener('change', on)
     return () => m.removeEventListener('change', on)
@@ -35,6 +36,18 @@ export const ArrowIcon = (p) => (
 )
 export const PlayIcon = (p) => (
   <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" {...p}><path fill="currentColor" d="M8 5.5v13a.6.6 0 0 0 .9.5l10.3-6.5a.6.6 0 0 0 0-1L8.9 5a.6.6 0 0 0-.9.5Z" /></svg>
+)
+export const SoundOnIcon = (p) => (
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" {...S} {...p}><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /></svg>
+)
+export const SoundOffIcon = (p) => (
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" {...S} {...p}><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" /><path d="M16 9.5l5 5M21 9.5l-5 5" /></svg>
+)
+export const SunIcon = (p) => (
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" {...S} {...p}><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4" /></svg>
+)
+export const MoonIcon = (p) => (
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" {...S} {...p}><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg>
 )
 export const HeartIcon = (p) => (
   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" {...p}><path fill="currentColor" d="M12 20.5s-7.5-4.6-9.3-9.2C1.5 8 3.6 4.5 7.2 4.5c2 0 3.6 1.1 4.8 2.8 1.2-1.7 2.8-2.8 4.8-2.8 3.6 0 5.7 3.5 4.5 6.8-1.8 4.6-9.3 9.2-9.3 9.2Z" /></svg>
@@ -108,8 +121,10 @@ function nautilusChambers(cx, cy, rMax, turns) {
 }
 
 /* ---------------- Botão CTA magnético ---------------- */
-export function CTA({ variant = 'dark', size = 'md', label = CTA_LABEL, className = '', magnet = 8, full = false, compact = false, ...rest }) {
+export function CTA({ variant = 'dark', size = 'md', label, className = '', magnet = 8, full = false, compact = false, ...rest }) {
   const ref = useRef(null)
+  const T = useT()
+  const { lang } = usePrefs()
   const fine = useFinePointer()
   const reduce = useReducedMotion()
   const x = useMotionValue(0)
@@ -138,7 +153,7 @@ export function CTA({ variant = 'dark', size = 'md', label = CTA_LABEL, classNam
   return (
     <motion.a
       ref={ref}
-      href={WHATSAPP_URL}
+      href={lang === 'en' ? WHATSAPP_URL_EN : WHATSAPP_URL}
       target="_blank"
       rel="noopener noreferrer"
       className={`cta cta--${variant} cta--${size} ${full ? 'cta--full' : ''} ${className}`}
@@ -153,7 +168,7 @@ export function CTA({ variant = 'dark', size = 'md', label = CTA_LABEL, classNam
       <span className="cta__border" aria-hidden="true" />
       <span className="cta__inner">
         <WhatsAppIcon className="cta__wa" />
-        <span className="cta__label">{compact ? 'Visita' : label}</span>
+        <span className="cta__label">{compact ? T.ctaShort : label || T.cta}</span>
         {!compact && <ArrowIcon className="cta__arrow" />}
       </span>
       {ripples.map((r) => (
@@ -247,39 +262,51 @@ export function Reveal({ children, delay = 0, y = 24, className = '', as = 'div'
 }
 
 /* ---------------- Mídia (vídeo ou placeholder) ---------------- */
-export function MediaSlot({ item = {}, playing = true, eager = false, showLabel = true }) {
+export function MediaSlot({ item = {}, playing = true, eager = false, showLabel = true, sound = false }) {
   const vref = useRef(null)
   const wrap = useRef(null)
   const visible = useInView(wrap, { amount: 0.2 })
+  // capas e vídeos só carregam perto da tela (exceto o hero)
+  const near = useInView(wrap, { once: true, margin: '600px 0px' })
   const mobile = useMobile()
-  const src = mobile && item.srcMobile ? item.srcMobile : item.src
+  // vídeos "eager" (hero) só recebem o arquivo depois do carregamento da página
+  const [late, setLate] = useState(!eager)
+  useEffect(() => {
+    if (!eager) return
+    const go = () => ('requestIdleCallback' in window ? requestIdleCallback(() => setLate(true), { timeout: 2500 }) : setTimeout(() => setLate(true), 800))
+    if (document.readyState === 'complete') go()
+    else { window.addEventListener('load', go, { once: true }); return () => window.removeEventListener('load', go) }
+  }, [eager])
+  const fileSrc = mobile && item.srcMobile ? item.srcMobile : item.src
+  const src = late && (eager || near) ? fileSrc : ''
+  const poster = eager || near ? item.poster || undefined : undefined
 
   useEffect(() => {
     const v = vref.current
     if (!v) return
+    v.muted = !sound
     if (playing && visible) {
       const p = v.play()
       if (p && p.catch) p.catch(() => {})
     } else v.pause()
-  }, [playing, visible, src])
+  }, [playing, visible, src, sound])
 
   return (
     <div ref={wrap} className="media">
-      {src ? (
+      {fileSrc ? (
         <video
           ref={vref}
           className="media__video"
-          src={src}
-          poster={item.poster || undefined}
+          src={src || undefined}
+          poster={poster}
           muted
           loop
           playsInline
-          autoPlay={eager}
-          preload={eager ? 'auto' : 'none'}
+          preload="none"
           aria-label={item.label || item.bairro}
         />
       ) : item.poster ? (
-        <img className="media__video" src={item.poster} alt={item.label || item.bairro || ''} loading={eager ? 'eager' : 'lazy'} />
+        <img className="media__video" src={poster} alt={item.label || item.bairro || ''} loading={eager ? 'eager' : 'lazy'} />
       ) : (
         <div className="media__ph" role="img" aria-label={`Espaço para vídeo: ${item.label || item.bairro || ''}`}>
           <Scallop size={64} stroke={1} className="media__ph-shell" />
@@ -309,11 +336,11 @@ export const Eyebrow = ({ children, light }) => (
 )
 
 /* ---------------- Divisor de maré ---------------- */
-export function TideDivider({ from = '#FAF7F2', to = '#EFE6D8', flip = false }) {
+export function TideDivider({ from = 'var(--concha)', to = 'var(--areia)', flip = false }) {
   return (
-    <div className={`tide ${flip ? 'tide--flip' : ''} ${to === '#EFE6D8' ? 'grain' : ''}`} style={{ background: to }} aria-hidden="true">
+    <div className={`tide ${flip ? 'tide--flip' : ''}`} style={{ background: to }} aria-hidden="true">
       <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-        <path fill={from} d="M0 0 H1440 V38 C1260 72 1110 18 930 40 C760 61 610 70 450 46 C300 24 160 30 0 54 Z" />
+        <path style={{ fill: from }} d="M0 0 H1440 V38 C1260 72 1110 18 930 40 C760 61 610 70 450 46 C300 24 160 30 0 54 Z" />
       </svg>
     </div>
   )

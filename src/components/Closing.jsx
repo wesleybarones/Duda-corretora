@@ -1,11 +1,15 @@
 import { useRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform, useInView, useMotionValue, useSpring, useReducedMotion, animate } from 'framer-motion'
 import { RevealTitle, Reveal, Eyebrow, CTA, Phone, MediaSlot, Scallop, Nautilus, PlayIcon, WhatsAppIcon, ArrowIcon, EASE, useFinePointer, useMobile } from './ui'
-import { ABOUT, TESTIMONIALS, TESTIMONIAL_VIDEO, FAQ, WHATSAPP_URL, INSTAGRAM_URL, SITE_URL } from '../config'
+import { ABOUT, TESTIMONIALS, TESTIMONIAL_VIDEO, FAQ, WHATSAPP_URL, INSTAGRAM_URL, SITE_URL, PERFIL } from '../config'
 import { WaveRecede } from './Story'
+import { useT, tx } from '../i18n'
+import { usePrefs } from '../prefs'
+import { WHATSAPP_URL_EN } from '../config'
 
 /* ======================= SOBRE ======================= */
 function Stat({ s }) {
+  const { lang } = usePrefs()
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, amount: 0.6 })
   const [v, setV] = useState(0)
@@ -17,12 +21,13 @@ function Stat({ s }) {
   return (
     <li ref={ref} className="stat">
       <span className="stat__n">{typeof s.value === 'number' ? v : '[00]'}{s.suffix}</span>
-      <span className="stat__l">{s.label}</span>
+      <span className="stat__l">{tx(s, 'label', lang)}</span>
     </li>
   )
 }
 
 function Signature() {
+  const T = useT()
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, amount: 0.8 })
   const paths = [
@@ -36,7 +41,7 @@ function Signature() {
     'M156 44 C 146 38, 136 50, 140 58 C 144 64, 154 58, 158 46 C 156 54, 158 62, 166 60 C 182 56, 200 50, 226 44',
   ]
   return (
-    <svg ref={ref} className="signature" viewBox="0 0 240 76" aria-label="Assinatura Duda" role="img">
+    <svg ref={ref} className="signature" viewBox="0 0 240 76" aria-label={T.about.signature} role="img">
       {paths.map((d, i) => (
         <motion.path key={i} d={d} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
           initial={{ pathLength: 0, opacity: 0 }} animate={inView ? { pathLength: 1, opacity: 1 } : {}}
@@ -48,25 +53,29 @@ function Signature() {
 
 /* Vídeo da Duda: toca uma vez ao entrar na tela e para no último quadro */
 function AboutVideo({ v }) {
+  const T = useT()
   const ref = useRef(null)
   const reduce = useReducedMotion()
   const mobile = useMobile()
   const inView = useInView(ref, { once: true, amount: 0.45 })
+  const near = useInView(ref, { once: true, margin: '600px 0px' })
   useEffect(() => {
     const el = ref.current
     if (!el || reduce || !inView) return
     const p = el.play()
     if (p && p.catch) p.catch(() => {})
   }, [inView, reduce])
-  const alt = 'Duda, corretora de imóveis em Niterói, cruza os braços e sorri'
-  if (reduce) return <img src={v.final || v.poster} alt={alt} loading="lazy" />
+  const alt = T.about.videoAlt
+  if (reduce) return <img ref={ref} src={v.final || v.poster} alt={alt} loading="lazy" />
   return (
-    <video ref={ref} src={mobile && v.srcMobile ? v.srcMobile : v.src} poster={v.poster}
-      muted playsInline preload="metadata" aria-label={alt} />
+    <video ref={ref} src={near ? (mobile && v.srcMobile ? v.srcMobile : v.src) : undefined} poster={near ? v.poster : undefined}
+      muted playsInline preload="none" aria-label={alt} />
   )
 }
 
 export function About() {
+  const T = useT()
+  const { lang } = usePrefs()
   const ref = useRef(null)
   const reduce = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
@@ -81,16 +90,16 @@ export function About() {
             </clipPath>
           </svg>
           <div className={`about__photo ${ABOUT.video ? 'about__photo--video' : ''}`}>
-            {ABOUT.video ? <AboutVideo v={ABOUT.video} /> : ABOUT.photo ? <img src={ABOUT.photo} alt="Duda, corretora de imóveis em Niterói" loading="lazy" /> : (
-              <div className="about__ph"><Scallop size={90} stroke={0.9} /><span>Foto da Duda</span></div>
+            {ABOUT.video ? <AboutVideo v={ABOUT.video} /> : ABOUT.photo ? <img src={ABOUT.photo} alt={T.about.photoAlt} loading="lazy" /> : (
+              <div className="about__ph"><Scallop size={90} stroke={0.9} /><span>{T.about.photoPh}</span></div>
             )}
           </div>
           <span className="about__seal">CRECI 104.409</span>
         </motion.div>
         <div className="about__text">
-          <Eyebrow>Prazer, Duda</Eyebrow>
-          <RevealTitle id="about-title" text="Uma corretora que *conhece cada rua* de Niterói." className="h2" />
-          <Reveal as="p" className="lead">{ABOUT.bio}</Reveal>
+          <Eyebrow>{T.about.eyebrow}</Eyebrow>
+          <RevealTitle id="about-title" text={T.about.title} className="h2" />
+          <Reveal as="p" className="lead">{tx(ABOUT, 'bio', lang)}</Reveal>
           <ul className="stats">{ABOUT.stats.map((s, i) => <Stat key={i} s={s} />)}</ul>
           <Signature />
         </div>
@@ -101,20 +110,23 @@ export function About() {
 
 /* ======================= DEPOIMENTOS ======================= */
 function Note({ t }) {
+  const T = useT()
+  const { lang } = usePrefs()
   return (
     <article className="note">
       <div className="note__q" aria-hidden="true"><Scallop size={30} stroke={1.3} /><span>“</span></div>
-      <p className="note__text">{t.text}</p>
+      <p className="note__text">{tx(t, 'text', lang)}</p>
       <footer>
         <strong>{t.name}</strong>
         <span>{t.bairro}</span>
-        <span className="note__pill">vendido em {t.dias} dias</span>
+        <span className="note__pill">{T.testi.sold(t.dias)}</span>
       </footer>
     </article>
   )
 }
 
 export function Testimonials() {
+  const T = useT()
   const items = [...TESTIMONIALS.map((t) => ({ kind: 'note', t })), ...(TESTIMONIAL_VIDEO ? [{ kind: 'video' }] : [])]
   const [active, setActive] = useState(0)
   const mobile = useMobile()
@@ -125,17 +137,17 @@ export function Testimonials() {
     <section className="section testi" aria-labelledby="testi-title">
       <div className="container testi__head">
         <div>
-          <Eyebrow>Quem vendeu comigo</Eyebrow>
-          <RevealTitle id="testi-title" text="Proprietários que *confiaram*." className="h2" />
+          <Eyebrow>{T.testi.eyebrow}</Eyebrow>
+          <RevealTitle id="testi-title" text={T.testi.title} className="h2" />
         </div>
         <div className="testi__arrows">
           <MagArrow dir={-1} onClick={() => go(-1)} disabled={active === 0} />
           <MagArrow dir={1} onClick={() => go(1)} disabled={active === items.length - 1} />
         </div>
       </div>
-      <motion.div className="testi__stage" data-cursor="Arrastar"
+      <motion.div className="testi__stage" data-cursor={T.cursorDrag}
         onPanEnd={(e, info) => { if (info.offset.x < -50) go(1); else if (info.offset.x > 50) go(-1) }}
-        role="region" aria-roledescription="carrossel" aria-label="Depoimentos" tabIndex={0}
+        role="region" aria-roledescription={T.testi.aria} aria-label={T.testi.aria} tabIndex={0}
         onKeyDown={(e) => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1) }}>
         {items.map((it, i) => {
           const off = i - active
@@ -147,7 +159,7 @@ export function Testimonials() {
               {it.kind === 'note' ? <Note t={it.t} /> : (
                 <div className="testi__video">
                   <Phone><MediaSlot item={TESTIMONIAL_VIDEO} playing={off === 0} /></Phone>
-                  <p className="micro">Vídeo-depoimento (opcional)</p>
+                  <p className="micro">{T.testi.video}</p>
                 </div>
               )}
             </motion.div>
@@ -160,13 +172,14 @@ export function Testimonials() {
 }
 
 function MagArrow({ dir, onClick, disabled }) {
+  const T = useT()
   const ref = useRef(null)
   const fine = useFinePointer()
   const x = useMotionValue(0), y = useMotionValue(0)
   const sx = useSpring(x, { stiffness: 220, damping: 16 }), sy = useSpring(y, { stiffness: 220, damping: 16 })
   return (
     <motion.button ref={ref} className="mag-arrow" style={{ x: sx, y: sy }} onClick={onClick} disabled={disabled}
-      aria-label={dir < 0 ? 'Depoimento anterior' : 'Próximo depoimento'}
+      aria-label={dir < 0 ? T.testi.prev : T.testi.next}
       onMouseMove={(e) => { if (!fine) return; const r = ref.current.getBoundingClientRect(); x.set((e.clientX - r.left - r.width / 2) * 0.35); y.set((e.clientY - r.top - r.height / 2) * 0.35) }}
       onMouseLeave={() => { x.set(0); y.set(0) }} whileTap={{ scale: 0.94 }} data-cursor="hide">
       <ArrowIcon style={{ transform: dir < 0 ? 'rotate(180deg)' : 'none' }} />
@@ -176,15 +189,17 @@ function MagArrow({ dir, onClick, disabled }) {
 
 /* ======================= FAQ ======================= */
 export function Faq() {
+  const T = useT()
+  const { lang } = usePrefs()
   const [open, setOpen] = useState(0)
   return (
     <section id="duvidas" className="section faq grain" aria-labelledby="faq-title">
       <div className="container faq__grid">
         <div className="faq__aside">
-          <RevealTitle id="faq-title" text="Dúvidas de quem vai *vender*." className="h2" />
+          <RevealTitle id="faq-title" text={T.faq.title} className="h2" />
           <Reveal className="faq__card">
-            <Scallop size={34} stroke={1.2} />
-            <p>Ainda com dúvida? <br />Me chama no WhatsApp.</p>
+            <img className="faq__av" src={PERFIL.foto} alt="Duda" width="56" height="56" loading="lazy" />
+            <p>{T.faq.card1} <br />{T.faq.card2}</p>
             <CTA size="sm" />
           </Reveal>
         </div>
@@ -195,7 +210,7 @@ export function Faq() {
               <Reveal as="li" key={i} delay={i * 0.04} className={`qa ${isOpen ? 'is-open' : ''}`}>
                 <h3>
                   <button aria-expanded={isOpen} aria-controls={`qa-${i}`} id={`qa-b-${i}`} onClick={() => setOpen(isOpen ? -1 : i)}>
-                    <span>{f.q}</span>
+                    <span>{tx(f, 'q', lang)}</span>
                     <span className="qa__icon" aria-hidden="true" />
                   </button>
                 </h3>
@@ -204,7 +219,7 @@ export function Faq() {
                     <motion.div id={`qa-${i}`} role="region" aria-labelledby={`qa-b-${i}`} className="qa__a"
                       initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
                       transition={{ type: 'spring', stiffness: 170, damping: 26 }}>
-                      <p>{f.a}</p>
+                      <p>{tx(f, 'a', lang)}</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -219,6 +234,7 @@ export function Faq() {
 
 /* ======================= CTA FINAL ======================= */
 export function FinalCTA() {
+  const T = useT()
   const fine = useFinePointer()
   const reduce = useReducedMotion()
   const mx = useMotionValue(0), my = useMotionValue(0)
@@ -233,19 +249,19 @@ export function FinalCTA() {
   return (
     <section id="cta-final" className="final" data-dark aria-labelledby="final-title"
       onMouseMove={(e) => { if (!fine || reduce) return; mx.set(e.clientX / window.innerWidth - 0.5); my.set(e.clientY / window.innerHeight - 0.5) }}>
-      <WaveRecede color="#EFE6D8" />
+      <WaveRecede color="var(--areia)" />
       <div className="final__shells" aria-hidden="true">
         {shells.map(({ C, s, top, left, L }, i) => (
           <motion.div key={i} style={{ position: 'absolute', top, left, ...L }}><C size={s} stroke={0.8} /></motion.div>
         ))}
       </div>
       <div className="final__content">
-        <RevealTitle id="final-title" text="Vamos colocar seu imóvel *na vitrine*?" className="h2 final__title" stagger={0.07} />
-        <Reveal as="p" className="final__sub" delay={0.4}>Me chama no WhatsApp, marcamos uma visita e eu cuido do resto.</Reveal>
+        <RevealTitle id="final-title" text={T.final.title} className="h2 final__title" stagger={0.07} />
+        <Reveal as="p" className="final__sub" delay={0.4}>{T.final.sub}</Reveal>
         <motion.div className="final__btn" initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.8, delay: 0.55, ease: EASE }}>
           <CTA variant="light" size="xl" magnet={14} className="cta--glow" />
         </motion.div>
-        <Reveal as="p" className="micro final__micro" delay={0.7}>Atendimento de segunda a sexta, das 9h às 18h</Reveal>
+        <Reveal as="p" className="micro final__micro" delay={0.7}>{T.final.micro}</Reveal>
       </div>
       <div className="waves" aria-hidden="true">
         {[0, 1, 2].map((k) => (
@@ -260,49 +276,54 @@ export function FinalCTA() {
 
 /* ======================= RODAPÉ ======================= */
 export function Footer() {
+  const T = useT()
+  const F = T.footer
+  const { lang } = usePrefs()
   return (
     <footer className="footer" data-dark>
       <div className="container footer__grid">
         <div>
-          <p className="footer__brand"><Scallop size={24} stroke={1.3} /> Duda</p>
-          <p className="footer__tag">Seu imóvel merece ser visto, não só anunciado.</p>
+          <p className="footer__brand sunlit"><Scallop size={24} stroke={1.3} /> Duda</p>
+          <p className="footer__tag">{F.tag}</p>
         </div>
         <div>
-          <h2 className="footer__h">Contato</h2>
-          <a className="link-u" href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">WhatsApp (21) 99515-4231</a>
+          <h2 className="footer__h">{F.contact}</h2>
+          <a className="link-u" href={lang === 'en' ? WHATSAPP_URL_EN : WHATSAPP_URL} target="_blank" rel="noopener noreferrer">WhatsApp (21) 99515-4231</a>
           <address>Rua Murilo Portugal, 112 – São Francisco, Niterói/RJ</address>
         </div>
         <div>
-          <h2 className="footer__h">Horário</h2>
-          <p>Seg. a sex., 9h às 18h</p>
+          <h2 className="footer__h">{F.hours}</h2>
+          <p>{F.hoursText}</p>
         </div>
         <div>
-          <h2 className="footer__h">Redes</h2>
+          <h2 className="footer__h">{F.social}</h2>
           <a className="link-u" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Instagram @duda_corretoradeimoveis</a>
-          <a className="link-u" href={SITE_URL} target="_blank" rel="noopener noreferrer">Ver imóveis à venda</a>
+          <a className="link-u" href={SITE_URL} target="_blank" rel="noopener noreferrer">{F.site}</a>
         </div>
         <div>
-          <h2 className="footer__h">Registro</h2>
+          <h2 className="footer__h">{F.license}</h2>
           <p>CRECI 104.409</p>
         </div>
       </div>
-      <p className="footer__copy container">© {new Date().getFullYear()} Duda Corretora de Imóveis · Niterói/RJ</p>
-      <p className="footer__giant" aria-hidden="true">Duda</p>
+      <p className="footer__copy container">© {new Date().getFullYear()} {F.copy}</p>
+      <p className="footer__giant sunlit" aria-hidden="true"><span>Duda</span></p>
     </footer>
   )
 }
 
 /* ======================= Flutuantes ======================= */
 export function FloatingWA({ visible }) {
+  const T = useT()
+  const { lang } = usePrefs()
   return (
     <AnimatePresence>
       {visible && (
-        <motion.a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="fab" aria-label="Marque sua visita pelo WhatsApp"
+        <motion.a href={lang === 'en' ? WHATSAPP_URL_EN : WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="fab" aria-label={T.ctaAria}
           initial={{ opacity: 0, scale: 0.6, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.6, y: 20 }}
           transition={{ duration: 0.5, ease: EASE }} data-cursor="hide">
           <span className="fab__ring" aria-hidden="true" />
           <WhatsAppIcon width="26" height="26" />
-          <span className="fab__tip" role="tooltip">Marque sua visita</span>
+          <span className="fab__tip" role="tooltip">{T.cta}</span>
         </motion.a>
       )}
     </AnimatePresence>

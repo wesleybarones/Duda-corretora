@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform, useMotionValue, useSpring, useReducedM
 import { CTA, RevealTitle, Phone, MediaSlot, Nautilus, Scallop, PlayIcon, HeartIcon, ContractIcon, PapersIcon, UserCheckIcon, EASE, useFinePointer, useMobile } from './ui'
 import { HERO_VIDEO, VITRINE } from '../config'
 import { scrollToId } from '../scroll'
+import { useT } from '../i18n'
 
 /* blob orgânico: mesma estrutura de comandos para permitir morphing */
 function blob(radii, cx = 250, cy = 250) {
@@ -26,13 +27,11 @@ const BLOBS = [
   blob([232, 210, 218, 238, 204, 200, 222, 236]),
 ]
 
-const TRUST = [
-  { icon: ContractIcon, text: 'Sem contrato de exclusividade' },
-  { icon: PapersIcon, text: 'Eu cuido da burocracia' },
-  { icon: UserCheckIcon, text: 'Visitas com compradores reais' },
-]
+const TRUST_ICONS = [ContractIcon, PapersIcon, UserCheckIcon]
 
 export default function Hero() {
+  const T = useT()
+  const H = T.hero
   const ref = useRef(null)
   const reduce = useReducedMotion()
   const fine = useFinePointer()
@@ -71,22 +70,23 @@ export default function Hero() {
     <section id="topo" ref={ref} className="hero" aria-labelledby="hero-title">
       <div className="hero__grid container">
         <div className="hero__text">
-          <motion.p className="eyebrow" {...up(0.15)}>Corretora em Niterói · CRECI 104.409</motion.p>
-          <RevealTitle as="h1" text="Seu imóvel merece ser *visto*. Não só anunciado." id="hero-title" className="h1" stagger={0.06} delay={0.3} emphasisLast immediate />
-          <motion.p className="hero__sub lead" {...up(0.95)} id="hero-title-sub">
-            Eu gravo, apresento e divulgo seu imóvel com verdade, para uma das maiores vitrines de imóveis de Niterói. E só levo até você quem realmente quer comprar.
-          </motion.p>
-          <motion.div className="hero__ctas" {...up(1.08)}>
+          <motion.p className="eyebrow" {...up(0.15)}>{H.eyebrow}</motion.p>
+          <RevealTitle as="h1" key={H.title} text={H.title} id="hero-title" className="h1" stagger={0.06} delay={0.3} emphasisLast immediate />
+          <p className="hero__sub lead hero-rise" style={{ '--d': '.5s' }} id="hero-title-sub">
+            {H.sub}
+          </p>
+          <div className="hero__ctas hero-rise" style={{ '--d': '.6s' }}>
             <CTA size="lg" className="hero__cta" />
             <a href="#vitrine" className="link-u hero__secondary" onClick={(e) => { e.preventDefault(); scrollToId('vitrine') }}>
-              Ver como eu apresento um imóvel <span aria-hidden="true">↓</span>
+              {H.secondary} <span aria-hidden="true">↓</span>
             </a>
-          </motion.div>
-          <motion.ul className="hero__trust" {...up(1.2)} aria-label="Garantias">
-            {TRUST.map(({ icon: I, text }) => (
-              <li key={text}><I /> <span>{text}</span></li>
-            ))}
-          </motion.ul>
+          </div>
+          <ul className="hero__trust hero-rise" style={{ '--d': '.7s' }} aria-label={H.trustAria}>
+            {H.trust.map((text, i) => {
+              const I = TRUST_ICONS[i]
+              return <li key={i}><I /> <span>{text}</span></li>
+            })}
+          </ul>
         </div>
 
         <div className="hero__visual" aria-hidden="false">
@@ -136,20 +136,20 @@ export default function Hero() {
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3, duration: 0.8, ease: EASE }}>
             <div className="float-inner" style={{ '--phase': '0s' }}>
               <span className="pulse-dot" aria-hidden="true" />
-              <span><strong>Nova visita agendada</strong><small>Icaraí</small></span>
+              <span><strong>{H.cardVisit}</strong><small>Icaraí</small></span>
             </div>
           </motion.div>
           <motion.div className="float-card float-card--b" style={d2}
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.45, duration: 0.8, ease: EASE }}>
             <div className="float-inner" style={{ '--phase': '-2.5s' }}>
               <span className="float-play" aria-hidden="true"><PlayIcon width="14" height="14" /></span>
-              <span><strong>Apartamento de frente para o mar</strong><small>Icaraí</small></span>
+              <span><strong>{H.cardVideo}</strong><small>Icaraí</small></span>
             </div>
           </motion.div>
         </div>
       </div>
 
-      <motion.button className="hero__scroll" onClick={() => scrollToId('problema')} aria-label="Rolar para a próxima seção"
+      <motion.button className="hero__scroll" onClick={() => scrollToId('problema')} aria-label={H.scroll}
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }}>
         <Scallop size={26} stroke={1.3} />
       </motion.button>

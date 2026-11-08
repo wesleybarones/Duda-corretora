@@ -6,6 +6,18 @@
     <title>Duda Corretora | Venda seu imóvel em Niterói</title>
     <meta name="description" content="Quer vender seu imóvel em Niterói? Eu gravo vídeos verdadeiros do seu imóvel, divulgo em uma das maiores vitrines digitais da cidade, filtro os interessados e cuido da burocracia. Sem exclusividade." />
     <meta name="theme-color" content="#0E3B43" />
+    <script>
+      (function () {
+        var r = document.documentElement, t, l;
+        try { t = localStorage.getItem('duda-tema'); l = localStorage.getItem('duda-lang'); } catch (e) {}
+        if (!t) t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'pt') l = q;
+        if (l !== 'en') l = 'pt';
+        r.dataset.theme = t; r.dataset.lang = l; r.lang = l === 'en' ? 'en' : 'pt-BR';
+        if (t === 'night') document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0B1E23');
+      })();
+    </script>
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="pt_BR" />
     <meta property="og:url" content="https://duda-corretora.vercel.app/" />
@@ -15,11 +27,12 @@
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://duda-corretora.vercel.app/" />
+    <link rel="alternate" hreflang="pt-BR" href="https://duda-corretora.vercel.app/" />
+    <link rel="alternate" hreflang="en" href="https://duda-corretora.vercel.app/?lang=en" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..400;1,9..144,300..400&family=Manrope:wght@400;500;600&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..400;1,9..144,300..400&family=Manrope:wght@400;500;600&display=swap" />
+    <link rel="preload" href="/fonts/manrope-normal-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/fraunces-normal-latin.woff2" as="font" type="font/woff2" crossorigin />
   </head>
   <body>
     <div id="root"></div>

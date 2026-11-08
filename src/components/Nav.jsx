@@ -1,16 +1,33 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent, useSpring } from 'framer-motion'
-import { CTA, Scallop, EASE } from './ui'
+import { CTA, Scallop, SunIcon, MoonIcon, EASE } from './ui'
+import { useT } from '../i18n'
+import { usePrefs, setTheme, setLang } from '../prefs'
 import { scrollToId, scrollStore } from '../scroll'
 
-const LINKS = [
-  { id: 'como-funciona', label: 'Como funciona' },
-  { id: 'vitrine', label: 'Vitrine' },
-  { id: 'sobre', label: 'Sobre' },
-  { id: 'duvidas', label: 'Dúvidas' },
-]
+const LINK_IDS = ['como-funciona', 'vitrine', 'sobre', 'duvidas']
+
+function Prefs({ className = '' }) {
+  const T = useT()
+  const { theme, lang } = usePrefs()
+  const night = theme === 'night'
+  return (
+    <div className={`prefs ${className}`}>
+      <button type="button" className="prefs__btn" onClick={() => setTheme(night ? 'day' : 'night')}
+        aria-label={night ? T.nav.toDay : T.nav.toNight} title={night ? T.nav.toDay : T.nav.toNight} data-cursor="hide">
+        {night ? <SunIcon /> : <MoonIcon />}
+      </button>
+      <button type="button" className="prefs__btn prefs__lang" onClick={() => setLang(lang === 'en' ? 'pt' : 'en')}
+        aria-label={T.nav.lang} title={T.nav.lang} lang={lang === 'en' ? 'pt-BR' : 'en'} data-cursor="hide">
+        {T.nav.langShort}
+      </button>
+    </div>
+  )
+}
 
 export default function Nav() {
+  const T = useT()
+  const LINKS = LINK_IDS.map((id) => ({ id, label: T.nav.links[id] }))
   const { scrollY, scrollYProgress } = useScroll()
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30 })
   const [hidden, setHidden] = useState(false)
@@ -49,8 +66,8 @@ export default function Nav() {
         animate={{ y: hidden && !open ? -110 : 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: EASE }}
       >
-        <nav className="nav__pill" aria-label="Principal">
-          <a href="#topo" className="nav__brand" onClick={go('topo')} aria-label="Duda, voltar ao topo">
+        <nav className="nav__pill" aria-label={T.nav.aria}>
+          <a href="#topo" className="nav__brand sunlit" onClick={go('topo')} aria-label={T.nav.brand}>
             <Scallop size={22} stroke={1.4} />
             <span>Duda</span>
           </a>
@@ -65,9 +82,10 @@ export default function Nav() {
             ))}
           </ul>
           <div className="nav__actions">
+            <Prefs className="prefs--nav" />
             <CTA size="sm" className="nav__cta" magnet={6} />
-            <CTA size="sm" className="nav__cta-mobile" compact magnet={0} aria-label="Marque sua visita pelo WhatsApp" />
-            <button className={`nav__burger ${open ? 'is-open' : ''}`} onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="menu-mobile" aria-label={open ? 'Fechar menu' : 'Abrir menu'}>
+            <CTA size="sm" className="nav__cta-mobile" compact magnet={0} aria-label={T.ctaAria} />
+            <button className={`nav__burger ${open ? 'is-open' : ''}`} onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="menu-mobile" aria-label={open ? T.nav.close : T.nav.open}>
               <span /><span />
             </button>
           </div>
@@ -86,7 +104,7 @@ export default function Nav() {
             exit={{ clipPath: 'circle(0% at 90% 40px)' }}
             transition={{ duration: 0.7, ease: EASE }}
           >
-            <Scallop size={260} stroke={0.6} className="menu__shell" />
+            <span className="menu__sun sunlit" aria-hidden="true"><Scallop size={260} stroke={0.6} className="menu__shell" /></span>
             <ul>
               {LINKS.map((l, i) => (
                 <motion.li key={l.id} initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 + i * 0.07, duration: 0.6, ease: EASE }}>
@@ -95,6 +113,7 @@ export default function Nav() {
               ))}
             </ul>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.6 }}>
+              <Prefs className="prefs--menu" />
               <CTA variant="light" full magnet={0} />
               <p className="menu__note">Niterói · CRECI 104.409</p>
             </motion.div>

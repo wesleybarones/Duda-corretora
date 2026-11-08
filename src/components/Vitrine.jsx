@@ -1,8 +1,12 @@
-import { useRef, useState, useEffect, useLayoutEffect } from 'react'
+import { useRef, useState, useEffect, useLayoutEffect, createContext, useContext } from 'react'
 import { motion, useScroll, useTransform, useMotionValue, useSpring, useMotionValueEvent, useReducedMotion } from 'framer-motion'
-import { RevealTitle, Eyebrow, MediaSlot, CTA, Scallop, useDesktop, useFinePointer } from './ui'
+import { RevealTitle, Eyebrow, MediaSlot, CTA, Scallop, SoundOnIcon, SoundOffIcon, useDesktop, useFinePointer } from './ui'
 import { VITRINE } from '../config'
 import { WaveRecede } from './Story'
+import { useT, tx } from '../i18n'
+import { usePrefs } from '../prefs'
+
+const SoundCtx = createContext({ sound: false, setSound: () => {} })
 
 const SIZES = [
   { w: 300, off: 0 }, { w: 270, off: 70 }, { w: 320, off: -20 }, { w: 280, off: 50 },
@@ -26,6 +30,9 @@ function VCard({ item, i, active, onHover, fine, tilt }) {
   }
   const leave = () => { rx.set(0); ry.set(0); setHover(false); onHover?.(null) }
   const playing = fine ? hover : active
+  const { sound, setSound } = useContext(SoundCtx)
+  const T = useT()
+  const { lang } = usePrefs()
   return (
     <motion.article
       ref={ref}
@@ -35,28 +42,35 @@ function VCard({ item, i, active, onHover, fine, tilt }) {
       onMouseEnter={() => { setHover(true); onHover?.(i) }}
       onMouseLeave={leave}
       whileHover={tilt ? { scale: 1.03 } : undefined}
-      data-cursor="Assistir"
+      data-cursor={T.cursorWatch}
     >
-      <div className="vcard__media"><MediaSlot item={item} playing={playing} showLabel={false} /></div>
+      <div className="vcard__media"><MediaSlot item={item} playing={playing} showLabel={false} sound={sound && playing} /></div>
+      <button type="button" className={`vcard__sound ${sound ? 'is-on' : ''}`} aria-pressed={sound}
+        aria-label={sound ? T.vitrine.soundOff : T.vitrine.soundOn}
+        onClick={(e) => { e.stopPropagation(); setSound(!sound); if (!fine) setHover(true) }} data-cursor="hide">
+        {sound ? <SoundOnIcon /> : <SoundOffIcon />}
+      </button>
       <div className="vcard__cap">
         <strong>{item.bairro}</strong>
-        <span>{item.detalhe}</span>
+        <span>{tx(item, 'detalhe', lang)}</span>
       </div>
     </motion.article>
   )
 }
 
 function EndCard() {
+  const T = useT()
   return (
     <div className="vcard vcard--end" data-dark>
       <Scallop size={70} stroke={1} className="vcard__end-shell" />
-      <p className="h3">Seu imóvel pode ser o <em>próximo</em>.</p>
+      <p className="h3">{T.vitrine.next} <em>{T.vitrine.nextEm}</em>.</p>
       <CTA variant="light" />
     </div>
   )
 }
 
 function Pinned() {
+  const T = useT()
   const outer = useRef(null)
   const track = useRef(null)
   const [dist, setDist] = useState(0)
@@ -86,12 +100,13 @@ function Pinned() {
       <div className="vitrine__sticky">
         <div className="container vitrine__head">
           <div>
-            <Eyebrow>A vitrine</Eyebrow>
-            <RevealTitle text="É assim que o *seu* imóvel vai ser apresentado." className="h2" />
+            <Eyebrow>{T.vitrine.eyebrow}</Eyebrow>
+            <RevealTitle text={T.vitrine.title} className="h2" />
+            <p className="vitrine__hint"><SoundOnIcon width="15" height="15" /> {T.vitrine.hintDesk}</p>
           </div>
           <p className="vitrine__count" aria-live="polite"><span>{String(idx).padStart(2, '0')}</span> / {String(total).padStart(2, '0')}</p>
         </div>
-        <motion.div ref={track} className="vitrine__track" style={{ x: sx }} data-cursor="Arrastar">
+        <motion.div ref={track} className="vitrine__track" style={{ x: sx }} data-cursor={T.cursorDrag}>
           {VITRINE.map((v, i) => <VCard key={i} item={v} i={i} fine={fine} tilt={fine} />)}
           <EndCard />
         </motion.div>
@@ -102,6 +117,7 @@ function Pinned() {
 }
 
 function Carousel() {
+  const T = useT()
   const scroller = useRef(null)
   const [active, setActive] = useState(0)
   const total = VITRINE.length + 1
@@ -139,11 +155,12 @@ function Carousel() {
     <>
       <div className="container vitrine__head">
         <div>
-          <Eyebrow>A vitrine</Eyebrow>
-          <RevealTitle text="É assim que o *seu* imóvel vai ser apresentado." className="h2" />
+          <Eyebrow>{T.vitrine.eyebrow}</Eyebrow>
+          <RevealTitle text={T.vitrine.title} className="h2" />
+          <p className="vitrine__hint"><SoundOnIcon width="15" height="15" /> {T.vitrine.hintMob}</p>
         </div>
       </div>
-      <div ref={scroller} className="vitrine__carousel" data-cursor="Arrastar" tabIndex={0} aria-label="Vídeos de imóveis apresentados pela Duda">
+      <div ref={scroller} className="vitrine__carousel" data-cursor={T.cursorDrag} tabIndex={0} aria-label={T.vitrine.carousel}>
         {VITRINE.map((v, i) => (
           <div key={i} className={`vslide ${active === i ? 'is-active' : ''}`}>
             <VCard item={v} i={i} active={active === i} fine={false} tilt={false} />
@@ -160,12 +177,16 @@ function Carousel() {
 }
 
 export default function Vitrine() {
+  const T = useT()
   const desktop = useDesktop()
   const reduce = useReducedMotion()
+  const [sound, setSound] = useState(false)
   return (
-    <section id="vitrine" className="vitrine" aria-label="A vitrine">
-      <WaveRecede color="#0E3B43" />
-      {desktop && !reduce ? <Pinned /> : <div className="section section--tight"><Carousel /></div>}
-    </section>
+    <SoundCtx.Provider value={{ sound, setSound }}>
+      <section id="vitrine" className="vitrine" aria-label={T.vitrine.aria}>
+        <WaveRecede color="var(--pet)" />
+        {desktop && !reduce ? <Pinned /> : <div className="section section--tight"><Carousel /></div>}
+      </section>
+    </SoundCtx.Provider>
   )
 }
