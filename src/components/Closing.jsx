@@ -60,13 +60,6 @@ function AboutVideo({ v }) {
   const mobile = useMobile()
   const inView = useInView(ref, { once: true, amount: 0.45 })
   const near = useInView(ref, { once: true, margin: '600px 0px' })
-  const [armed, setArmed] = useState(false)
-  useEffect(() => {
-    const evs = ['wheel', 'touchstart', 'keydown', 'pointerdown']
-    const arm = () => { setArmed(true); evs.forEach((e) => window.removeEventListener(e, arm)) }
-    evs.forEach((e) => window.addEventListener(e, arm, { passive: true }))
-    return () => evs.forEach((e) => window.removeEventListener(e, arm))
-  }, [])
   useEffect(() => {
     const el = ref.current
     if (!el || reduce || !inView) return
@@ -334,6 +327,13 @@ function FooterMap() {
   const F = useT().footer
   const ref = useRef(null)
   const near = useInView(ref, { once: true, margin: '600px 0px' })
+  const [armed, setArmed] = useState(false)
+  useEffect(() => {
+    const evs = ['wheel', 'touchstart', 'keydown', 'pointerdown']
+    const arm = () => { setArmed(true); evs.forEach((e) => window.removeEventListener(e, arm)) }
+    evs.forEach((e) => window.addEventListener(e, arm, { passive: true }))
+    return () => evs.forEach((e) => window.removeEventListener(e, arm))
+  }, [])
   return (
     <a ref={ref} className="footer__map" href={MAP_PLACE} target="_blank" rel="noopener noreferrer" aria-label={F.mapAria}>
       {near && armed && <iframe title={F.mapAria} src={`https://www.google.com/maps?q=${MAP_LL}&z=16&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" tabIndex={-1} aria-hidden="true" />}
